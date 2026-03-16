@@ -1,0 +1,182 @@
+<div class="container-fluid p-4">
+  <h1 class="mb-5 bg-warning-subtle p-4 text-center rounded">Gestion de Salas de Reunion</h1>
+
+  @if (mensajeExito || mensajeError) {
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div class="toast show" [ngClass]="mensajeError ? 'border-danger' : 'border-success'" role="alert"
+           aria-live="assertive" aria-atomic="true">
+        <div class="toast-header" [ngClass]="mensajeError ? 'bg-danger' : 'bg-success'">
+          <strong class="me-auto">{{ mensajeError ? 'Error' : 'Exito' }}</strong>
+          <button type="button" class="btn-close" aria-label="Close" (click)="cerrarToast()"></button>
+        </div>
+        <div class="toast-body">
+          @if (mensajeExito) {
+            {{ mensajeExito }}
+          }
+
+          @if (mensajeError) {
+            {{ mensajeError }}
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="row g-5">
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-warning overflow-hidden">
+        <div class="card-header bg-warning text-dark text-center fw-bold fs-5">Salas Disponibles</div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Capacidad</th>
+              <th>Ubicación</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tbody class="table-group-divider border-warning-subtle">
+            <tr *ngFor="let sala of salas">
+              <td>{{ sala.nombreSala }}</td>
+              <td>{{ sala.capacidad }}</td>
+              <td>{{ sala.ubicacion }}</td>
+              <td>
+                  <span class="badge" [ngClass]="sala.disponible ? 'bg-success' : 'bg-danger'">
+                    {{ sala.disponible ? 'Disponible' : 'Mantenimiento' }}
+                  </span>
+              </td>
+              <td>
+                <button
+                  class="btn btn-sm"
+                  [ngClass]="sala.disponible ? 'btn-outline-danger' : 'btn-outline-success'"
+                  (click)="cambiarMantenimiento(sala, sala.disponible)"
+                >
+                  {{ sala.disponible ? 'Deshabilitar' : 'Habilitar' }}
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-warning mt-5">
+        <div class="card-header bg-warning text-dark text-center fw-bold fs-5">Nueva Reserva</div>
+        <div class="card-body text-center">
+          <form (ngSubmit)="crearReserva()">
+            <div class="mb-3">
+              <label class="form-label fw-bold" for="nombreUsuario">Nombre del usuario</label>
+              <input
+                id="nombreUsuario"
+                name="nombreUsuario"
+                type="text"
+                class="form-control"
+                [(ngModel)]="formularioReserva.nombreUsuario"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold" for="idSala">Sala</label>
+              <select
+                id="idSala"
+                name="idSala"
+                class="form-select"
+                [(ngModel)]="formularioReserva.idSala"
+                required
+              >
+                <option [ngValue]="0" disabled>Seleccione una sala</option>
+                <option *ngFor="let sala of salas" [ngValue]="sala.idSala">
+                  {{ sala.nombreSala }} - {{ sala.ubicacion }}
+                </option>
+              </select>
+            </div>
+
+            <div class="row g-2">
+              <div class="col-md-4">
+                <label class="form-label fw-bold" for="fecha">Fecha</label>
+                <input
+                  id="fecha"
+                  name="fecha"
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="formularioReserva.fecha"
+                  required
+                />
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label fw-bold" for="horaInicio">Hora inicio</label>
+                <input
+                  id="horaInicio"
+                  name="horaInicio"
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="formularioReserva.horaInicio"
+                  required
+                />
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label fw-bold" for="horaFin">Hora fin</label>
+                <input
+                  id="horaFin"
+                  name="horaFin"
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="formularioReserva.horaFin"
+                  required
+                />
+              </div>
+            </div>
+
+            <button class="btn btn-warning mt-3 fw-bold" type="submit">Registrar Reserva</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-warning overflow-hidden">
+        <div class="card-header bg-warning text-dark text-center fw-bold fs-5">Reservas Registradas</div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>Usuario</th>
+              <th>Sala</th>
+              <th>Fecha</th>
+              <th>Horario</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tbody class="table-group-divider border-warning-subtle">
+            <tr *ngFor="let reserva of reservas">
+              <td>{{ reserva.idReserva }}</td>
+              <td>{{ reserva.nombreUsuario }}</td>
+              <td>{{ reserva.sala.nombreSala }}</td>
+              <td>{{ reserva.fecha }}</td>
+              <td>{{ reserva.horaInicio }} - {{ reserva.horaFin }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-danger" (click)="cancelarReserva(reserva.idReserva)">
+                  Cancelar
+                </button>
+              </td>
+            </tr>
+
+              @if (reservas.length === 0) {
+                <tr>
+                  <td class="text-center text-muted" colspan="6">No hay reservas registradas.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
